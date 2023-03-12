@@ -1,0 +1,82 @@
+---
+title: "NormToTotalIonAboundances"
+author: "Mona Khorani"
+date: '2023-03-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+install.packages("dplyr")
+
+library(tidyverse)
+library("dplyr")
+library(magrittr)
+library(readxl)
+library(tidyverse)
+library(openxlsx)
+
+```
+
+
+```{r} 
+#get dataset
+Raw=read_csv('Raw-145-CM-OutlierRem-HipCortxMix-Pos-NormtoTIA-Progenesis-01March2023-QCCVless30Only - Copy.csv')
+```
+
+
+```{r}
+parameters <- data.frame(index = seq_len(76), ColSum = NA, SumDevAvg = NA) # Create an empty data.frame
+
+for (i in 1:76) {
+  col_sum <- sum(Raw[1:144, i+1]) # Compute the sum of each column 
+  parameters$ColSum[i] <- col_sum # Assign the column sum to the corresponding row of the ColSum column
+  parameters$SumDevAvg <- parameters$ColSum/mean(parameters$ColSum) # Divide each sum by the mean of sums and put them on SumDevAvg column on parameters data.frame
+}
+```
+
+
+```{r}
+empty_df <- data.frame(matrix(nrow = 144, ncol = 76)) # Create an empty data.frame
+colnames(empty_df) <- parameters$index
+
+# For loop calculate each value divided by its SumDevAvg and add them to correspondence col and row in empty_df
+for (j in 1:76) {
+    for (m in 1:144){
+     empty_df[m,j] <- Raw[m,j+1]/parameters$SumDevAvg[j]
+    }
+}
+
+# Save norm to TIA dataset
+write.xlsx(empty_df, "NormtoTIA.xlsx")
+
+```
+
+
+
+```{r}
+# Norm to TIA dataset (to calculate the ratio of the standard deviation to the mean)
+
+parameters1 <- data.frame(index = seq_len(76), ColSum1 = NA, SumDevAvg1 = NA) 
+for (i in 1:76) {
+  col_sum1 <- sum(empty_df[1:144, i+1]) # Compute the column sum
+  parameters1$ColSum1[i] <- col_sum1 # Assign the column sum to the corresponding row of the ColSum column
+  parameters1$SumDevAvg1 <- parameters1$ColSum1/mean(parameters1$ColSum1) # Divide each sum by the mean of sums and put them on SumDevAvg column on parameters data.frame
+}
+```
+
+
+```{r}
+# For Raw dataset
+StdDevAvg <- sd(parameters$ColSum)/mean(parameters$ColSum)
+StdDevAvg
+
+# For Norm dataset 
+StdDevAvg1 <- sd(parameters1$ColSum1)/mean(parameters1$ColSum1)
+StdDevAvg1
+
+```
+
