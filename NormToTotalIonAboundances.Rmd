@@ -75,8 +75,8 @@ StdDevAvg <- sd(parameters$ColSum)/mean(parameters$ColSum)
 StdDevAvg
 
 # For Norm dataset 
-StdDevAvg1 <- sd(parameters1$ColSum1)/mean(parameters1$ColSum1)
-StdDevAvg1
+StdDevAvg2 <- sd(parameters1$ColSum1)/mean(parameters1$ColSum1)
+StdDevAvg2
 
 ```
 
